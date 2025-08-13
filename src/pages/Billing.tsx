@@ -6,12 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DollarSign, CreditCard, FileText, AlertTriangle, TrendingUp } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Billing = () => {
+  const { toast } = useToast();
+
   const billingStats = [
-    { label: "Monthly Revenue", value: "$28,750", change: "+15.3% vs last month", icon: DollarSign },
-    { label: "Outstanding", value: "$3,240", change: "12 invoices", icon: AlertTriangle },
-    { label: "Processed", value: "$156,890", change: "This month", icon: CreditCard },
+    { label: "Monthly Revenue", value: "₹28,75,000", change: "+15.3% vs last month", icon: DollarSign },
+    { label: "Outstanding", value: "₹3,24,000", change: "12 invoices", icon: AlertTriangle },
+    { label: "Processed", value: "₹1,56,89,000", change: "This month", icon: CreditCard },
     { label: "Growth Rate", value: "23.5%", change: "Year over year", icon: TrendingUp },
   ];
 
@@ -19,7 +22,7 @@ const Billing = () => {
     { 
       id: "INV-001", 
       member: "TechCorp Inc.", 
-      amount: "$1,299", 
+      amount: "₹1,29,900", 
       dueDate: "2024-02-15", 
       status: "Paid", 
       plan: "Enterprise" 
@@ -27,7 +30,7 @@ const Billing = () => {
     { 
       id: "INV-002", 
       member: "Startup Agency", 
-      amount: "$599", 
+      amount: "₹59,900", 
       dueDate: "2024-02-20", 
       status: "Pending", 
       plan: "Premium" 
@@ -35,7 +38,7 @@ const Billing = () => {
     { 
       id: "INV-003", 
       member: "Design Studio", 
-      amount: "$299", 
+      amount: "₹29,900", 
       dueDate: "2024-02-18", 
       status: "Overdue", 
       plan: "Basic" 
@@ -43,12 +46,19 @@ const Billing = () => {
     { 
       id: "INV-004", 
       member: "Marketing Co.", 
-      amount: "$899", 
+      amount: "₹89,900", 
       dueDate: "2024-02-25", 
       status: "Paid", 
       plan: "Premium" 
     },
   ];
+
+  const handleGenerateInvoice = () => {
+    toast({
+      title: "Invoice Generated",
+      description: "New invoice has been created successfully.",
+    });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -71,7 +81,7 @@ const Billing = () => {
                 <h1 className="text-3xl font-bold text-foreground">Billing & Payments</h1>
                 <p className="text-muted-foreground">Automated billing with plan management and payment tracking</p>
               </div>
-              <Button>
+              <Button onClick={handleGenerateInvoice}>
                 <FileText className="h-4 w-4 mr-2" />
                 Generate Invoice
               </Button>

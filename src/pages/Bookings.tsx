@@ -6,8 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, CreditCard, Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Bookings = () => {
+  const { toast } = useToast();
+
   const bookingStats = [
     { label: "Today's Bookings", value: "47", change: "+8 from yesterday", icon: Calendar },
     { label: "Active Sessions", value: "32", change: "Currently ongoing", icon: Clock },
@@ -20,6 +23,14 @@ const Bookings = () => {
     { id: "2", title: "Client Presentation", room: "Meeting Room B", time: "14:00 - 16:00", attendees: 12, status: "confirmed" },
     { id: "3", title: "Team Standup", room: "Hot Desk Area", time: "09:00 - 09:30", attendees: 15, status: "pending" },
   ];
+
+  const handleNewBooking = () => {
+    toast({
+      title: "New Booking",
+      description: "Opening booking form...",
+    });
+    // In a real app, this would open a booking form modal or navigate to a booking form page
+  };
 
   return (
     <div className="min-h-screen bg-dashboard-bg">
@@ -64,7 +75,7 @@ const Bookings = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Upcoming Bookings</CardTitle>
-                    <Button size="sm">New Booking</Button>
+                    <Button size="sm" onClick={handleNewBooking}>New Booking</Button>
                   </div>
                 </CardHeader>
                 <CardContent>

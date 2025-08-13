@@ -7,8 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserPlus, Phone, Mail, Calendar, TrendingUp, Search } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Leads = () => {
+  const { toast } = useToast();
+
   const leadStats = [
     { label: "Total Leads", value: "156", change: "+23 this week", icon: UserPlus },
     { label: "Qualified", value: "89", change: "57% conversion", icon: TrendingUp },
@@ -52,6 +55,14 @@ const Leads = () => {
     },
   ];
 
+  const handleAddLead = () => {
+    toast({
+      title: "Add Lead",
+      description: "Opening lead capture form...",
+    });
+    // In a real app, this would open a lead capture form modal or navigate to a form page
+  };
+
   const getStageColor = (stage: string) => {
     switch (stage) {
       case "Lead": return "outline";
@@ -74,7 +85,7 @@ const Leads = () => {
                 <h1 className="text-3xl font-bold text-foreground">Lead Management</h1>
                 <p className="text-muted-foreground">End-to-end CRM pipeline from lead capture to conversion</p>
               </div>
-              <Button>
+              <Button onClick={handleAddLead}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Add Lead
               </Button>

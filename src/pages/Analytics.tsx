@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { TrendingUp, DollarSign, Users, Building2, Calendar, Target } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Analytics = () => {
+  const { toast } = useToast();
+
   const kpiStats = [
     { label: "Occupancy Rate", value: "87%", change: "+5.2% from last month", icon: Building2 },
     { label: "Revenue Growth", value: "23.5%", change: "Year over year", icon: DollarSign },
@@ -17,12 +20,12 @@ const Analytics = () => {
   ];
 
   const revenueData = [
-    { month: "Jan", revenue: 24500, forecast: 26000 },
-    { month: "Feb", revenue: 28750, forecast: 30000 },
-    { month: "Mar", revenue: 32100, forecast: 33500 },
-    { month: "Apr", revenue: 29800, forecast: 31000 },
-    { month: "May", revenue: 35600, forecast: 37000 },
-    { month: "Jun", revenue: 41200, forecast: 42500 },
+    { month: "Jan", revenue: 2450000, forecast: 2600000 },
+    { month: "Feb", revenue: 2875000, forecast: 3000000 },
+    { month: "Mar", revenue: 3210000, forecast: 3350000 },
+    { month: "Apr", revenue: 2980000, forecast: 3100000 },
+    { month: "May", revenue: 3560000, forecast: 3700000 },
+    { month: "Jun", revenue: 4120000, forecast: 4250000 },
   ];
 
   const spaceUtilization = [
@@ -31,6 +34,22 @@ const Analytics = () => {
     { name: "Meeting Rooms", value: 76, color: "#ffc658" },
     { name: "Event Spaces", value: 45, color: "#ff7300" },
   ];
+
+  const handleExportReport = () => {
+    toast({
+      title: "Exporting Report",
+      description: "Your analytics report is being generated and will be downloaded shortly.",
+    });
+    // In a real app, this would generate and download a PDF/Excel report
+  };
+
+  const handleScenarioPlanning = () => {
+    toast({
+      title: "Scenario Planning",
+      description: "Opening AI-powered scenario planning tool...",
+    });
+    // In a real app, this would open a scenario planning interface with AI insights
+  };
 
   return (
     <div className="min-h-screen bg-dashboard-bg">
@@ -45,8 +64,8 @@ const Analytics = () => {
                 <p className="text-muted-foreground">AI-integrated insights for occupancy forecasting and revenue prediction</p>
               </div>
               <div className="flex space-x-2">
-                <Button variant="outline">Export Report</Button>
-                <Button>
+                <Button variant="outline" onClick={handleExportReport}>Export Report</Button>
+                <Button onClick={handleScenarioPlanning}>
                   <Target className="h-4 w-4 mr-2" />
                   Scenario Planning
                 </Button>
@@ -81,20 +100,21 @@ const Analytics = () => {
             {/* Revenue Prediction */}
             <Card className="animate-slide-up">
               <CardHeader>
-                <CardTitle>Revenue Prediction</CardTitle>
+                <CardTitle>Revenue Prediction (₹)</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={revenueData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="month" />
-                    <YAxis />
+                    <YAxis tickFormatter={(value) => `₹${(value / 100000).toFixed(1)}L`} />
                     <Tooltip 
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "6px",
                       }}
+                      formatter={(value) => [`₹${(value / 100000).toFixed(1)}L`, ""]}
                     />
                     <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Actual Revenue" />
                     <Bar dataKey="forecast" fill="hsl(var(--primary))" opacity={0.5} name="Forecast" />
@@ -165,7 +185,7 @@ const Analytics = () => {
               </CardContent>
             </Card>
 
-            {/* Alerts & Recommendations */}
+            {/* AI Recommendations */}
             <Card className="animate-slide-up">
               <CardHeader>
                 <CardTitle>AI Recommendations</CardTitle>

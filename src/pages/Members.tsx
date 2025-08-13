@@ -7,8 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, UserPlus, CreditCard, Calendar, Search } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Members = () => {
+  const { toast } = useToast();
+
   const memberStats = [
     { label: "Total Members", value: "324", change: "+12 this week", icon: Users },
     { label: "New This Month", value: "28", change: "+15.3% vs last month", icon: UserPlus },
@@ -23,6 +26,14 @@ const Members = () => {
     { id: "4", name: "Lisa Williams", email: "lisa@agency.com", plan: "Premium", joinDate: "2024-03-01", status: "Pending", credits: 30 },
   ];
 
+  const handleAddMember = () => {
+    toast({
+      title: "Add Member",
+      description: "Opening member registration form...",
+    });
+    // In a real app, this would open a member registration form modal or navigate to a registration form page
+  };
+
   return (
     <div className="min-h-screen bg-dashboard-bg">
       <Header />
@@ -35,7 +46,7 @@ const Members = () => {
                 <h1 className="text-3xl font-bold text-foreground">Member Management</h1>
                 <p className="text-muted-foreground">Manage member profiles, plans, and access</p>
               </div>
-              <Button>
+              <Button onClick={handleAddMember}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Add Member
               </Button>
