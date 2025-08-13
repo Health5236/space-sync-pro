@@ -1,96 +1,70 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* Coworking Space Design System */
 @layer base {
   :root {
+    /* Brand Colors */
+    --primary: 217 91% 59%;
+    --primary-foreground: 0 0% 100%;
+    --primary-dark: 217 91% 49%;
+    
+    /* Status Colors */
+    --available: 142 76% 36%;
+    --occupied: 0 84% 60%;
+    --reserved: 39 92% 56%;
+    --maintenance: 280 67% 58%;
+    
+    /* Neutral Palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --foreground: 222 15% 15%;
+    --muted: 217 32% 96%;
+    --muted-foreground: 217 11% 65%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --card-foreground: 222 15% 15%;
+    
+    /* Interactive */
+    --border: 217 32% 91%;
+    --input: 217 32% 91%;
+    --ring: 217 91% 59%;
+    --accent: 217 32% 96%;
+    --accent-foreground: 222 15% 15%;
+    
+    /* Semantic */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 39 92% 56%;
+    --warning-foreground: 39 92% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Dashboard specific */
+    --dashboard-bg: 217 20% 98%;
+    --metric-card: 0 0% 100%;
+    --chart-1: 217 91% 59%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 39 92% 56%;
+    --chart-4: 280 67% 58%;
+    --chart-5: 0 84% 60%;
+    
+    --radius: 8px;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 222 15% 8%;
+    --foreground: 217 32% 96%;
+    --muted: 222 15% 12%;
+    --muted-foreground: 217 11% 65%;
+    --card: 222 15% 10%;
+    --card-foreground: 217 32% 96%;
+    --border: 222 15% 15%;
+    --input: 222 15% 15%;
+    --accent: 222 15% 12%;
+    --accent-foreground: 217 32% 96%;
+    --dashboard-bg: 222 15% 6%;
+    --metric-card: 222 15% 10%;
   }
 }
 
@@ -98,8 +72,130 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Status indicators */
+  .status-available {
+    @apply bg-green-500 text-white;
+  }
+  
+  .status-occupied {
+    @apply bg-red-500 text-white;
+  }
+  
+  .status-reserved {
+    @apply bg-yellow-500 text-black;
+  }
+  
+  .status-maintenance {
+    @apply bg-purple-500 text-white;
+  }
+  
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+  
+  .animate-pulse-soft {
+    animation: pulseSoft 2s infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Floor plan specific styles */
+.floor-plan {
+  @apply relative bg-gradient-to-br from-slate-50 to-slate-100;
+}
+
+.workspace-item {
+  @apply transition-all duration-200 hover:scale-105 cursor-pointer;
+}
+
+.workspace-item.available {
+  @apply bg-green-100 border-green-300 hover:bg-green-200;
+}
+
+.workspace-item.occupied {
+  @apply bg-red-100 border-red-300 hover:bg-red-200;
+}
+
+.workspace-item.reserved {
+  @apply bg-yellow-100 border-yellow-300 hover:bg-yellow-200;
+}
+
+.workspace-item.maintenance {
+  @apply bg-purple-100 border-purple-300 hover:bg-purple-200;
+}
+
+/* Dashboard metrics */
+.metric-card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6 transition-all duration-200 hover:shadow-md;
+}
+
+.metric-trend-up {
+  @apply text-green-600;
+}
+
+.metric-trend-down {
+  @apply text-red-600;
+}
+
+/* Custom chart colors */
+.recharts-cartesian-axis-tick-value {
+  @apply text-muted-foreground text-xs;
+}
+
+.recharts-legend-item-text {
+  @apply text-foreground text-sm;
 }
