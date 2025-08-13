@@ -40,7 +40,6 @@ const Analytics = () => {
       title: "Exporting Report",
       description: "Your analytics report is being generated and will be downloaded shortly.",
     });
-    // In a real app, this would generate and download a PDF/Excel report
   };
 
   const handleScenarioPlanning = () => {
@@ -48,7 +47,6 @@ const Analytics = () => {
       title: "Scenario Planning",
       description: "Opening AI-powered scenario planning tool...",
     });
-    // In a real app, this would open a scenario planning interface with AI insights
   };
 
   return (
@@ -107,14 +105,14 @@ const Analytics = () => {
                   <BarChart data={revenueData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="month" />
-                    <YAxis tickFormatter={(value) => `₹${(value / 100000).toFixed(1)}L`} />
+                    <YAxis tickFormatter={(value: number) => `₹${(value / 100000).toFixed(1)}L`} />
                     <Tooltip 
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "6px",
                       }}
-                      formatter={(value) => [`₹${(value / 100000).toFixed(1)}L`, ""]}
+                      formatter={(value: number) => [`₹${(value / 100000).toFixed(1)}L`, ""]}
                     />
                     <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Actual Revenue" />
                     <Bar dataKey="forecast" fill="hsl(var(--primary))" opacity={0.5} name="Forecast" />
