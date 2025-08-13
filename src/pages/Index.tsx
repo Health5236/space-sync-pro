@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Building2, 
   Users, 
@@ -16,9 +17,44 @@ import FloorPlan from "@/components/spaces/FloorPlan";
 import BookingCalendar from "@/components/bookings/BookingCalendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleAddMember = () => {
+    toast({
+      title: "Add Member",
+      description: "Redirecting to member registration form...",
+    });
+    navigate("/members");
+  };
+
+  const handleBookSpace = () => {
+    toast({
+      title: "Book Space",
+      description: "Opening space booking interface...",
+    });
+    navigate("/bookings");
+  };
+
+  const handleViewFloorPlan = () => {
+    toast({
+      title: "Floor Plan",
+      description: "Loading interactive floor plan...",
+    });
+    navigate("/spaces");
+  };
+
+  const handleViewAnalytics = () => {
+    toast({
+      title: "Analytics",
+      description: "Opening detailed usage reports...",
+    });
+    navigate("/analytics");
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -51,7 +87,7 @@ const Index = () => {
               />
               <MetricCard
                 title="Revenue (MTD)"
-                value="$28,750"
+                value="₹28,750"
                 change={{ value: "+15.3% vs last month", trend: "up" }}
                 icon={DollarSign}
               />
@@ -111,25 +147,37 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <button className="p-4 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={handleAddMember}
+                    className="p-4 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
                     <UserPlus className="h-6 w-6 text-primary mb-2" />
                     <p className="font-medium">Add Member</p>
                     <p className="text-xs text-muted-foreground">Register new member</p>
                   </button>
                   
-                  <button className="p-4 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={handleBookSpace}
+                    className="p-4 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
                     <Calendar className="h-6 w-6 text-primary mb-2" />
                     <p className="font-medium">Book Space</p>
                     <p className="text-xs text-muted-foreground">Reserve meeting room</p>
                   </button>
                   
-                  <button className="p-4 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={handleViewFloorPlan}
+                    className="p-4 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
                     <Building2 className="h-6 w-6 text-primary mb-2" />
                     <p className="font-medium">View Floor Plan</p>
                     <p className="text-xs text-muted-foreground">Check space availability</p>
                   </button>
                   
-                  <button className="p-4 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={handleViewAnalytics}
+                    className="p-4 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
                     <TrendingUp className="h-6 w-6 text-primary mb-2" />
                     <p className="font-medium">View Analytics</p>
                     <p className="text-xs text-muted-foreground">Usage reports</p>
