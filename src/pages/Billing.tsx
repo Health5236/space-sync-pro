@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ const Billing = () => {
   const { toast } = useToast();
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const mockInvoices = [
     {
@@ -62,7 +61,7 @@ const Billing = () => {
     const matchesSearch = invoice.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.id.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesFilter = filterStatus === "" || invoice.status === filterStatus;
+    const matchesFilter = filterStatus === "all" || invoice.status === filterStatus;
     
     return matchesSearch && matchesFilter;
   });
@@ -139,7 +138,7 @@ const Billing = () => {
                   <SelectValue placeholder="Filter status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="paid">Paid</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="overdue">Overdue</SelectItem>

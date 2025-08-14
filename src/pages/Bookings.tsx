@@ -28,7 +28,7 @@ const Bookings = () => {
   const { toast } = useToast();
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [currentView, setCurrentView] = useState<"list" | "calendar">("list");
 
   const mockBookings = [
@@ -81,7 +81,7 @@ const Bookings = () => {
       booking.member.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.space.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesFilter = filterStatus === "" || booking.status === filterStatus;
+    const matchesFilter = filterStatus === "all" || booking.status === filterStatus;
     
     return matchesSearch && matchesFilter;
   });
@@ -148,7 +148,7 @@ const Bookings = () => {
                   <SelectValue placeholder="Filter status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>

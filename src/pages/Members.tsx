@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,8 +16,8 @@ const Members = () => {
   const { toast } = useToast();
   const [showMemberForm, setShowMemberForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterPlan, setFilterPlan] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterPlan, setFilterPlan] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const mockMembers = [
     {
@@ -86,8 +85,8 @@ const Members = () => {
       member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       member.company.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesPlan = filterPlan === "" || member.plan === filterPlan;
-    const matchesStatus = filterStatus === "" || member.status === filterStatus;
+    const matchesPlan = filterPlan === "all" || member.plan === filterPlan;
+    const matchesStatus = filterStatus === "all" || member.status === filterStatus;
     
     return matchesSearch && matchesPlan && matchesStatus;
   });
@@ -157,7 +156,7 @@ const Members = () => {
                   <SelectValue placeholder="Plan" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Plans</SelectItem>
+                  <SelectItem value="all">All Plans</SelectItem>
                   <SelectItem value="Premium">Premium</SelectItem>
                   <SelectItem value="Basic">Basic</SelectItem>
                   <SelectItem value="Enterprise">Enterprise</SelectItem>
@@ -170,7 +169,7 @@ const Members = () => {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                   <SelectItem value="suspended">Suspended</SelectItem>
