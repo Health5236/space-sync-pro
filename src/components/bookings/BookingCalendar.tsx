@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Clock, Users, CreditCard } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Booking {
   id: string;
@@ -50,8 +51,8 @@ const mockBookings: Booking[] = [
 ];
 
 const BookingCalendar = () => {
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const timeSlots = Array.from({ length: 12 }, (_, i) => {
     const hour = i + 8;
@@ -73,6 +74,33 @@ const BookingCalendar = () => {
     }
   };
 
+  const handleBookNow = (timeSlot: string) => {
+    toast({
+      title: "Booking Initiated",
+      description: `Booking slot for ${timeSlot}. Please fill out the booking form.`,
+    });
+  };
+
+  const handlePreviousDay = () => {
+    const prevDay = new Date(currentDate);
+    prevDay.setDate(prevDay.getDate() - 1);
+    setCurrentDate(prevDay);
+    toast({
+      title: "Date Changed",
+      description: `Viewing bookings for ${prevDay.toLocaleDateString()}`,
+    });
+  };
+
+  const handleNextDay = () => {
+    const nextDay = new Date(currentDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    setCurrentDate(nextDay);
+    toast({
+      title: "Date Changed",
+      description: `Viewing bookings for ${nextDay.toLocaleDateString()}`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -80,7 +108,7 @@ const BookingCalendar = () => {
           <div className="flex items-center justify-between">
             <CardTitle>Meeting Room Schedule</CardTitle>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="font-medium">
@@ -91,7 +119,7 @@ const BookingCalendar = () => {
                   day: 'numeric' 
                 })}
               </span>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" onClick={handleNextDay}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -104,7 +132,7 @@ const BookingCalendar = () => {
               return (
                 <div
                   key={timeSlot}
-                  className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                  className={`p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer ${
                     booking 
                       ? 'border-primary bg-primary/5 hover:bg-primary/10' 
                       : 'border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50'
@@ -141,7 +169,12 @@ const BookingCalendar = () => {
                   ) : (
                     <div className="text-center py-4">
                       <p className="text-xs text-muted-foreground">Available</p>
-                      <Button variant="ghost" size="sm" className="mt-2 text-xs">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="mt-2 text-xs"
+                        onClick={() => handleBookNow(timeSlot)}
+                      >
                         Book Now
                       </Button>
                     </div>

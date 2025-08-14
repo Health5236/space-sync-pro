@@ -3,15 +3,20 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Plus, Search, Filter, Download, DollarSign, CreditCard, Calendar, TrendingUp } from "lucide-react";
+import { FileText, Plus, Search, Filter, Download, DollarSign, CreditCard, Calendar, TrendingUp, Send, Eye, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import InvoiceForm from "@/components/forms/InvoiceForm";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
+import { useToast } from "@/hooks/use-toast";
 
 const Billing = () => {
+  const { toast } = useToast();
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
   const mockInvoices = [
     {
@@ -53,10 +58,42 @@ const Billing = () => {
     }
   };
 
-  const filteredInvoices = mockInvoices.filter(invoice =>
-    invoice.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInvoices = mockInvoices.filter(invoice => {
+    const matchesSearch = invoice.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.id.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filterStatus === "" || invoice.status === filterStatus;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const handleInvoiceAction = (action: string, invoiceId: string) => {
+    toast({
+      title: `${action} Invoice`,
+      description: `${action} action for invoice ${invoiceId} has been processed.`,
+    });
+  };
+
+  const handleBulkAction = (action: string) => {
+    toast({
+      title: `Bulk ${action}`,
+      description: `${action} action applied to selected invoices.`,
+    });
+  };
+
+  const handlePaymentSetup = () => {
+    toast({
+      title: "Payment Settings",
+      description: "Opening payment gateway configuration...",
+    });
+  };
+
+  const handleAutoReminder = () => {
+    toast({
+      title: "Auto Reminders",
+      description: "Setting up automatic payment reminders...",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -71,13 +108,18 @@ const Billing = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Billing & Invoices</h1>
                 <p className="text-gray-600 mt-1">Manage invoices, payments and billing</p>
               </div>
-              <Button 
-                onClick={() => setShowInvoiceForm(true)}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Generate Invoice
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => handleBulkAction("Send Reminders")}>
+                  Send Reminders
+                </Button>
+                <Button 
+                  onClick={() => setShowInvoiceForm(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Generate Invoice
+                </Button>
+              </div>
             </div>
 
             {/* Search and Filters */}
@@ -91,9 +133,22 @@ const Billing = () => {
                   className="pl-10"
                 />
               </div>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Filter
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[180px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="overdue">Overdue</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" onClick={() => handleBulkAction("Export")} className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Export
               </Button>
             </div>
 
@@ -156,17 +211,18 @@ const Billing = () => {
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle>Recent Invoices</CardTitle>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    Export
-                  </Button>
+                  <CardTitle>Recent Invoices ({filteredInvoices.length})</CardTitle>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleBulkAction("Mark as Sent")}>
+                      Bulk Actions
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {filteredInvoices.map((invoice) => (
-                    <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                    <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className="p-2 bg-blue-100 rounded-lg">
                           <FileText className="h-5 w-5 text-blue-600" />
@@ -184,10 +240,37 @@ const Billing = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-lg font-semibold">{invoice.amount}</p>
-                        <p className="text-sm text-gray-500">Due: {invoice.dueDate}</p>
-                        <p className="text-xs text-gray-400">Issued: {invoice.issueDate}</p>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-lg font-semibold">{invoice.amount}</p>
+                          <p className="text-sm text-gray-500">Due: {invoice.dueDate}</p>
+                          <p className="text-xs text-gray-400">Issued: {invoice.issueDate}</p>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => handleInvoiceAction("View", invoice.id)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Invoice
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleInvoiceAction("Send", invoice.id)}>
+                              <Send className="h-4 w-4 mr-2" />
+                              Send Invoice
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleInvoiceAction("Download", invoice.id)}>
+                              <Download className="h-4 w-4 mr-2" />
+                              Download PDF
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleInvoiceAction("Mark as Paid", invoice.id)}>
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              Mark as Paid
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   ))}
@@ -195,7 +278,7 @@ const Billing = () => {
               </CardContent>
             </Card>
 
-            {/* Payment Methods */}
+            {/* Payment Methods & Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -241,6 +324,10 @@ const Billing = () => {
                       </div>
                       <Badge variant="default">Active</Badge>
                     </div>
+                    
+                    <Button variant="outline" className="w-full mt-4" onClick={handlePaymentSetup}>
+                      Configure Payment Settings
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -251,21 +338,25 @@ const Billing = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" onClick={() => setShowInvoiceForm(true)}>
                       <FileText className="h-4 w-4 mr-2" />
                       Create Quote
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" onClick={() => handleBulkAction("Download Reports")}>
                       <Download className="h-4 w-4 mr-2" />
                       Download Reports
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" onClick={handlePaymentSetup}>
                       <CreditCard className="h-4 w-4 mr-2" />
                       Payment Settings
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" onClick={handleAutoReminder}>
                       <Calendar className="h-4 w-4 mr-2" />
                       Schedule Reminders
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start" onClick={() => handleBulkAction("Generate Report")}>
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      Financial Reports
                     </Button>
                   </div>
                 </CardContent>

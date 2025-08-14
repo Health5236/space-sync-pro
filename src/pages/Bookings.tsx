@@ -1,12 +1,16 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Users, Plus, Filter, Search } from "lucide-react";
+import { Calendar, Clock, Users, Plus, Filter, Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BookingForm from "@/components/forms/BookingForm";
+import BookingCalendar from "@/components/bookings/BookingCalendar";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
+import { useToast } from "@/hooks/use-toast";
 
 interface Booking {
   id: string;
@@ -21,8 +25,11 @@ interface Booking {
 }
 
 const Bookings = () => {
+  const { toast } = useToast();
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [currentView, setCurrentView] = useState<"list" | "calendar">("list");
 
   const mockBookings = [
     {
@@ -69,11 +76,30 @@ const Bookings = () => {
     }
   };
 
-  const filteredBookings = mockBookings.filter(booking =>
-    booking.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    booking.member.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    booking.space.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredBookings = mockBookings.filter(booking => {
+    const matchesSearch = booking.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.member.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.space.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filterStatus === "" || booking.status === filterStatus;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const handleExport = () => {
+    toast({
+      title: "Export Started",
+      description: "Your booking data is being exported to CSV...",
+    });
+  };
+
+  const handleFilterChange = (value: string) => {
+    setFilterStatus(value);
+    toast({
+      title: "Filter Applied",
+      description: `Showing ${value || "all"} bookings`,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -88,13 +114,21 @@ const Bookings = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Bookings</h1>
                 <p className="text-gray-600 mt-1">Manage space reservations and bookings</p>
               </div>
-              <Button 
-                onClick={() => setShowBookingForm(true)}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                New Booking
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => setCurrentView(currentView === "list" ? "calendar" : "list")}
+                >
+                  {currentView === "list" ? "Calendar View" : "List View"}
+                </Button>
+                <Button 
+                  onClick={() => setShowBookingForm(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Booking
+                </Button>
+              </div>
             </div>
 
             {/* Search and Filters */}
@@ -108,9 +142,21 @@ const Bookings = () => {
                   className="pl-10"
                 />
               </div>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Filter
+              <Select value={filterStatus} onValueChange={handleFilterChange}>
+                <SelectTrigger className="w-[180px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" onClick={handleExport} className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Export
               </Button>
             </div>
 
@@ -125,6 +171,7 @@ const Bookings = () => {
                     </div>
                     <Calendar className="h-8 w-8 text-blue-600" />
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">+3 from yesterday</p>
                 </CardContent>
               </Card>
               
@@ -137,6 +184,7 @@ const Bookings = () => {
                     </div>
                     <Clock className="h-8 w-8 text-green-600" />
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">85% capacity</p>
                 </CardContent>
               </Card>
               
@@ -149,6 +197,7 @@ const Bookings = () => {
                     </div>
                     <Users className="h-8 w-8 text-purple-600" />
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">Avg 6.9 per booking</p>
                 </CardContent>
               </Card>
               
@@ -163,54 +212,64 @@ const Bookings = () => {
                       <span className="text-yellow-600 font-bold">₹</span>
                     </div>
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">+12% this month</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Bookings List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>All Bookings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {filteredBookings.map((booking) => (
-                    <div key={booking.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <h3 className="font-semibold">{booking.title}</h3>
-                            <p className="text-sm text-gray-600">by {booking.member}</p>
+            {/* Main Content */}
+            {currentView === "calendar" ? (
+              <BookingCalendar />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>All Bookings ({filteredBookings.length})</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {filteredBookings.map((booking) => (
+                      <div key={booking.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <h3 className="font-semibold">{booking.title}</h3>
+                              <p className="text-sm text-gray-600">by {booking.member}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {booking.date}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {booking.startTime} - {booking.endTime}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="h-4 w-4" />
+                              {booking.attendees} attendees
+                            </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {booking.date}
+                        <div className="flex items-center gap-3">
+                          <Badge variant={getStatusColor(booking.status)}>
+                            {booking.status}
+                          </Badge>
+                          <span className="text-sm font-medium text-gray-700">
+                            {booking.space}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {booking.startTime} - {booking.endTime}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="h-4 w-4" />
-                            {booking.attendees} attendees
-                          </span>
+                          <Button variant="outline" size="sm">
+                            Edit
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Badge variant={getStatusColor(booking.status)}>
-                          {booking.status}
-                        </Badge>
-                        <span className="text-sm font-medium text-gray-700">
-                          {booking.space}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           <BookingForm 
