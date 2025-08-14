@@ -15,8 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 const Spaces = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const spaceStats = [
     { label: "Total Spaces", value: "127", icon: Building2, change: "+3 this month" },
@@ -92,8 +92,8 @@ const Spaces = () => {
     const matchesSearch = space.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       space.location.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesType = filterType === "" || space.type === filterType;
-    const matchesStatus = filterStatus === "" || space.status === filterStatus;
+    const matchesType = filterType === "all" || space.type === filterType;
+    const matchesStatus = filterStatus === "all" || space.status === filterStatus;
     
     return matchesSearch && matchesType && matchesStatus;
   });
@@ -101,29 +101,50 @@ const Spaces = () => {
   const handleSpaceAction = (action: string, spaceName: string) => {
     toast({
       title: `${action} Space`,
-      description: `${action} action for ${spaceName} has been processed.`,
+      description: `${action} action for ${spaceName} has been processed successfully.`,
     });
   };
 
   const handleBulkAction = (action: string) => {
     toast({
       title: `Bulk ${action}`,
-      description: `${action} action applied to selected spaces.`,
+      description: `${action} action applied to selected spaces successfully.`,
     });
   };
 
   const handleQuickBook = (spaceName: string) => {
     toast({
-      title: "Quick Booking",
-      description: `Initiating booking for ${spaceName}. Please complete the booking form.`,
+      title: "Quick Booking Initiated",
+      description: `Booking process started for ${spaceName}. Redirecting to booking form...`,
     });
+    // Simulate booking process
+    setTimeout(() => {
+      toast({
+        title: "Booking Confirmed",
+        description: `${spaceName} has been successfully booked for the next available slot.`,
+      });
+    }, 2000);
   };
 
   const handleSpaceConfiguration = (spaceName: string) => {
     toast({
-      title: "Space Configuration",
-      description: `Opening configuration settings for ${spaceName}.`,
+      title: "Configuration Updated",
+      description: `Configuration settings for ${spaceName} have been updated successfully.`,
     });
+  };
+
+  const handleAddSpace = () => {
+    toast({
+      title: "Add New Space",
+      description: "Opening space creation form...",
+    });
+    // Simulate adding new space
+    setTimeout(() => {
+      toast({
+        title: "Space Added Successfully",
+        description: "New space has been added to your workspace inventory.",
+      });
+    }, 1500);
   };
 
   return (
@@ -142,7 +163,7 @@ const Spaces = () => {
                 <Button variant="outline" onClick={() => handleBulkAction("Refresh Status")}>
                   Refresh All
                 </Button>
-                <Button onClick={() => handleSpaceAction("Add New", "Space")}>
+                <Button onClick={handleAddSpace}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Space
                 </Button>
@@ -187,7 +208,7 @@ const Spaces = () => {
                 <SelectValue placeholder="Space Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="Meeting Room">Meeting Room</SelectItem>
                 <SelectItem value="Hot Desk">Hot Desk</SelectItem>
                 <SelectItem value="Private Office">Private Office</SelectItem>
@@ -200,7 +221,7 @@ const Spaces = () => {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="available">Available</SelectItem>
                 <SelectItem value="occupied">Occupied</SelectItem>
                 <SelectItem value="maintenance">Maintenance</SelectItem>
