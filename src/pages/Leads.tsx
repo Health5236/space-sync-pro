@@ -1,208 +1,237 @@
 
-import Header from "@/components/layout/Header";
-import Sidebar from "@/components/layout/Sidebar";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserPlus, Mail, Phone, Building2, Plus, Search, Filter, TrendingUp, Users, DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UserPlus, Phone, Mail, Calendar, TrendingUp, Search } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import LeadForm from "@/components/forms/LeadForm";
+import Header from "@/components/layout/Header";
+import Sidebar from "@/components/layout/Sidebar";
 
 const Leads = () => {
-  const { toast } = useToast();
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const leadStats = [
-    { label: "Total Leads", value: "156", change: "+23 this week", icon: UserPlus },
-    { label: "Qualified", value: "89", change: "57% conversion", icon: TrendingUp },
-    { label: "Tours Scheduled", value: "34", change: "This week", icon: Calendar },
-    { label: "Signed", value: "28", change: "This month", icon: Mail },
+  const mockLeads = [
+    {
+      id: "1",
+      name: "Alice Cooper",
+      email: "alice@techcorp.com",
+      phone: "+91 99887 76543",
+      company: "TechCorp Solutions",
+      source: "Website",
+      interest: "High",
+      budget: "₹15,000 - ₹30,000/month",
+      status: "new",
+      createdDate: "2024-01-15",
+      avatar: "",
+    },
+    {
+      id: "2",
+      name: "Bob Smith",
+      email: "bob@startup.io",
+      phone: "+91 88776 65432",
+      company: "Startup Inc",
+      source: "Referral",
+      interest: "Medium",
+      budget: "₹5,000 - ₹15,000/month",
+      status: "contacted",
+      createdDate: "2024-01-12",
+      avatar: "",
+    },
+    {
+      id: "3",
+      name: "Carol Williams",
+      email: "carol@freelance.com",
+      phone: "+91 77665 54321",
+      company: "Freelance Designer",
+      source: "Social Media",
+      interest: "High",
+      budget: "₹0 - ₹5,000/month",
+      status: "qualified",
+      createdDate: "2024-01-10",
+      avatar: "",
+    },
   ];
 
-  const leads = [
-    { 
-      id: "1", 
-      name: "Alex Rodriguez", 
-      email: "alex@startup.co", 
-      phone: "+1 (555) 123-4567",
-      source: "Website", 
-      stage: "Qualified", 
-      probability: 75,
-      assignedTo: "Sarah M.",
-      lastContact: "2024-01-15"
-    },
-    { 
-      id: "2", 
-      name: "Jennifer Kim", 
-      email: "jen@agency.com", 
-      phone: "+1 (555) 987-6543",
-      source: "Referral", 
-      stage: "Tour", 
-      probability: 85,
-      assignedTo: "Mike T.",
-      lastContact: "2024-01-14"
-    },
-    { 
-      id: "3", 
-      name: "David Chen", 
-      email: "david@techcorp.io", 
-      phone: "+1 (555) 456-7890",
-      source: "Walk-in", 
-      stage: "Lead", 
-      probability: 35,
-      assignedTo: "Lisa W.",
-      lastContact: "2024-01-13"
-    },
-  ];
-
-  const handleAddLead = () => {
-    toast({
-      title: "Add Lead",
-      description: "Opening lead capture form...",
-    });
-    // In a real app, this would open a lead capture form modal or navigate to a form page
-  };
-
-  const getStageColor = (stage: string) => {
-    switch (stage) {
-      case "Lead": return "outline";
-      case "Qualified": return "secondary";
-      case "Tour": return "default";
-      case "Signed": return "default";
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "new": return "default";
+      case "contacted": return "secondary";
+      case "qualified": return "outline";
+      case "converted": return "default";
+      case "lost": return "destructive";
       default: return "outline";
     }
   };
 
+  const getInterestColor = (interest: string) => {
+    switch (interest) {
+      case "High": return "bg-green-100 text-green-800";
+      case "Medium": return "bg-yellow-100 text-yellow-800";
+      case "Low": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const filteredLeads = mockLeads.filter(lead =>
+    lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    lead.company.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-dashboard-bg">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-6">
-          <div className="mb-6">
-            <div className="flex items-center justify-between">
+          <div className="space-y-6">
+            {/* Header Section */}
+            <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Lead Management</h1>
-                <p className="text-muted-foreground">End-to-end CRM pipeline from lead capture to conversion</p>
+                <h1 className="text-3xl font-bold text-gray-900">Leads</h1>
+                <p className="text-gray-600 mt-1">Manage potential customers and track conversions</p>
               </div>
-              <Button onClick={handleAddLead}>
-                <UserPlus className="h-4 w-4 mr-2" />
+              <Button 
+                onClick={() => setShowLeadForm(true)}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
                 Add Lead
               </Button>
             </div>
-          </div>
 
-          {/* Lead Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            {leadStats.map((stat) => (
-              <Card key={stat.label} className="animate-fade-in">
+            {/* Search and Filters */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search leads..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Filter
+              </Button>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                      <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
+                      <p className="text-sm font-medium text-gray-600">Total Leads</p>
+                      <p className="text-2xl font-bold">156</p>
                     </div>
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <stat.icon className="h-6 w-6 text-primary" />
-                    </div>
+                    <Users className="h-8 w-8 text-blue-600" />
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">New This Week</p>
+                      <p className="text-2xl font-bold">23</p>
+                    </div>
+                    <UserPlus className="h-8 w-8 text-green-600" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Conversion Rate</p>
+                      <p className="text-2xl font-bold">24%</p>
+                    </div>
+                    <TrendingUp className="h-8 w-8 text-purple-600" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Potential Revenue</p>
+                      <p className="text-2xl font-bold">₹2,45,000</p>
+                    </div>
+                    <DollarSign className="h-8 w-8 text-yellow-600" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Leads List */}
+            <Card>
+              <CardHeader>
+                <CardTitle>All Leads</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {filteredLeads.map((lead) => (
+                    <div key={lead.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={lead.avatar} />
+                          <AvatarFallback>
+                            {lead.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-semibold">{lead.name}</h3>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Mail className="h-4 w-4" />
+                              {lead.email}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Phone className="h-4 w-4" />
+                              {lead.phone}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Building2 className="h-4 w-4" />
+                              {lead.company}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs text-gray-500">Source: {lead.source}</span>
+                            <span className="text-xs text-gray-500">Budget: {lead.budget}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge variant={getStatusColor(lead.status)}>
+                          {lead.status}
+                        </Badge>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getInterestColor(lead.interest)}`}>
+                          {lead.interest}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {lead.createdDate}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Pipeline Overview */}
-          <Card className="mb-6 animate-slide-up">
-            <CardHeader>
-              <CardTitle>Sales Pipeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="flex-1 text-center">
-                  <div className="text-2xl font-bold text-foreground">156</div>
-                  <div className="text-sm text-muted-foreground">Leads</div>
-                </div>
-                <div className="flex-1 text-center">
-                  <div className="text-2xl font-bold text-blue-600">89</div>
-                  <div className="text-sm text-muted-foreground">Qualified</div>
-                </div>
-                <div className="flex-1 text-center">
-                  <div className="text-2xl font-bold text-yellow-600">34</div>
-                  <div className="text-sm text-muted-foreground">Tours</div>
-                </div>
-                <div className="flex-1 text-center">
-                  <div className="text-2xl font-bold text-green-600">28</div>
-                  <div className="text-sm text-muted-foreground">Signed</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Leads Table */}
-          <Card className="animate-slide-up">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Leads Directory</CardTitle>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search leads..." className="pl-10 w-64" />
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Source</TableHead>
-                    <TableHead>Stage</TableHead>
-                    <TableHead>Probability</TableHead>
-                    <TableHead>Assigned To</TableHead>
-                    <TableHead>Last Contact</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leads.map((lead) => (
-                    <TableRow key={lead.id}>
-                      <TableCell className="font-medium">{lead.name}</TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="flex items-center text-sm">
-                            <Mail className="h-3 w-3 mr-1" />
-                            {lead.email}
-                          </div>
-                          <div className="flex items-center text-sm text-muted-foreground">
-                            <Phone className="h-3 w-3 mr-1" />
-                            {lead.phone}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{lead.source}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStageColor(lead.stage)}>{lead.stage}</Badge>
-                      </TableCell>
-                      <TableCell>{lead.probability}%</TableCell>
-                      <TableCell>{lead.assignedTo}</TableCell>
-                      <TableCell>{lead.lastContact}</TableCell>
-                      <TableCell>
-                        <div className="flex space-x-1">
-                          <Button variant="ghost" size="sm">Edit</Button>
-                          <Button variant="ghost" size="sm">Call</Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <LeadForm 
+            open={showLeadForm} 
+            onOpenChange={setShowLeadForm} 
+          />
         </main>
       </div>
     </div>

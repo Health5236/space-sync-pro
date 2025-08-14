@@ -1,212 +1,343 @@
 
-import Header from "@/components/layout/Header";
-import Sidebar from "@/components/layout/Sidebar";
-import OccupancyChart from "@/components/dashboard/OccupancyChart";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { TrendingUp, DollarSign, Users, Building2, Calendar, Target } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
+import { TrendingUp, Users, Building, DollarSign, Download, FileText, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Header from "@/components/layout/Header";
+import Sidebar from "@/components/layout/Sidebar";
 
 const Analytics = () => {
   const { toast } = useToast();
 
-  const kpiStats = [
-    { label: "Occupancy Rate", value: "87%", change: "+5.2% from last month", icon: Building2 },
-    { label: "Revenue Growth", value: "23.5%", change: "Year over year", icon: DollarSign },
-    { label: "Member Retention", value: "94%", change: "+2.1% from last quarter", icon: Users },
-    { label: "Booking Efficiency", value: "76%", change: "Room utilization", icon: Calendar },
+  // Mock data for charts
+  const occupancyData = [
+    { month: "Jan", occupancy: 75, revenue: 285000 },
+    { month: "Feb", occupancy: 82, revenue: 320000 },
+    { month: "Mar", occupancy: 78, revenue: 298000 },
+    { month: "Apr", occupancy: 88, revenue: 385000 },
+    { month: "May", occupancy: 85, revenue: 370000 },
+    { month: "Jun", occupancy: 92, revenue: 420000 },
   ];
 
-  const revenueData = [
-    { month: "Jan", revenue: 2450000, forecast: 2600000 },
-    { month: "Feb", revenue: 2875000, forecast: 3000000 },
-    { month: "Mar", revenue: 3210000, forecast: 3350000 },
-    { month: "Apr", revenue: 2980000, forecast: 3100000 },
-    { month: "May", revenue: 3560000, forecast: 3700000 },
-    { month: "Jun", revenue: 4120000, forecast: 4250000 },
+  const spaceUtilizationData = [
+    { name: "Meeting Rooms", value: 35, color: "#8884d8" },
+    { name: "Hot Desks", value: 25, color: "#82ca9d" },
+    { name: "Private Offices", value: 20, color: "#ffc658" },
+    { name: "Co-working", value: 20, color: "#ff7300" },
   ];
 
-  const spaceUtilization = [
-    { name: "Hot Desks", value: 68, color: "#8884d8" },
-    { name: "Private Offices", value: 89, color: "#82ca9d" },
-    { name: "Meeting Rooms", value: 76, color: "#ffc658" },
-    { name: "Event Spaces", value: 45, color: "#ff7300" },
+  const membershipData = [
+    { plan: "Basic", members: 120, revenue: 240000 },
+    { plan: "Premium", members: 85, revenue: 340000 },
+    { plan: "Enterprise", members: 45, revenue: 360000 },
+    { plan: "Day Pass", members: 200, revenue: 100000 },
   ];
 
   const handleExportReport = () => {
     toast({
-      title: "Exporting Report",
-      description: "Your analytics report is being generated and will be downloaded shortly.",
+      title: "Report Export",
+      description: "Generating comprehensive analytics report...",
     });
+    
+    // Simulate report generation
+    setTimeout(() => {
+      toast({
+        title: "Report Ready",
+        description: "Analytics report has been generated and downloaded successfully.",
+      });
+    }, 2000);
   };
 
   const handleScenarioPlanning = () => {
     toast({
       title: "Scenario Planning",
-      description: "Opening AI-powered scenario planning tool...",
+      description: "Opening scenario planning tool...",
     });
+    
+    // Simulate opening scenario planning
+    setTimeout(() => {
+      toast({
+        title: "Scenario Analysis",
+        description: "Based on current trends, projected 15% growth in next quarter.",
+      });
+    }, 1500);
   };
 
   return (
-    <div className="min-h-screen bg-dashboard-bg">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-6">
-          <div className="mb-6">
-            <div className="flex items-center justify-between">
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
-                <p className="text-muted-foreground">AI-integrated insights for occupancy forecasting and revenue prediction</p>
+                <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+                <p className="text-gray-600 mt-1">Comprehensive insights and performance metrics</p>
               </div>
-              <div className="flex space-x-2">
-                <Button variant="outline" onClick={handleExportReport}>Export Report</Button>
-                <Button onClick={handleScenarioPlanning}>
-                  <Target className="h-4 w-4 mr-2" />
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={handleExportReport}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export Report
+                </Button>
+                <Button 
+                  onClick={handleScenarioPlanning}
+                  className="flex items-center gap-2"
+                >
+                  <Calculator className="h-4 w-4" />
                   Scenario Planning
                 </Button>
               </div>
             </div>
-          </div>
 
-          {/* KPI Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            {kpiStats.map((stat) => (
-              <Card key={stat.label} className="animate-fade-in">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                      <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                      <p className="text-xs text-green-600 mt-1">{stat.change}</p>
+                      <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                      <p className="text-2xl font-bold">₹42,85,750</p>
                     </div>
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <stat.icon className="h-6 w-6 text-primary" />
-                    </div>
+                    <DollarSign className="h-8 w-8 text-green-600" />
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <Badge variant="default" className="bg-green-100 text-green-800">
+                      ↑ +12.5%
+                    </Badge>
+                    <span className="text-xs text-gray-500 ml-2">vs last month</span>
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* Occupancy Chart */}
-            <OccupancyChart />
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Occupancy Rate</p>
+                      <p className="text-2xl font-bold">87%</p>
+                    </div>
+                    <Building className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <Badge variant="default" className="bg-blue-100 text-blue-800">
+                      ↑ +5.2%
+                    </Badge>
+                    <span className="text-xs text-gray-500 ml-2">vs last month</span>
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Revenue Prediction */}
-            <Card className="animate-slide-up">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Active Members</p>
+                      <p className="text-2xl font-bold">450</p>
+                    </div>
+                    <Users className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <Badge variant="default" className="bg-purple-100 text-purple-800">
+                      ↑ +8.3%
+                    </Badge>
+                    <span className="text-xs text-gray-500 ml-2">vs last month</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Growth Rate</p>
+                      <p className="text-2xl font-bold">15.2%</p>
+                    </div>
+                    <TrendingUp className="h-8 w-8 text-orange-600" />
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <Badge variant="default" className="bg-orange-100 text-orange-800">
+                      ↑ +2.1%
+                    </Badge>
+                    <span className="text-xs text-gray-500 ml-2">vs last month</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Occupancy Trend */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Occupancy & Revenue Trend</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={occupancyData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip 
+                        formatter={(value: any, name: string) => {
+                          if (name === 'revenue') {
+                            return [`₹${(value as number).toLocaleString()}`, 'Revenue'];
+                          }
+                          return [`${value}%`, 'Occupancy'];
+                        }}
+                      />
+                      <Bar yAxisId="right" dataKey="revenue" fill="#8884d8" opacity={0.3} />
+                      <Line yAxisId="left" type="monotone" dataKey="occupancy" stroke="#8884d8" strokeWidth={3} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Space Utilization */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Space Utilization</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={spaceUtilizationData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={120}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {spaceUtilizationData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: any) => [`${value}%`, 'Utilization']} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    {spaceUtilizationData.map((item, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <div 
+                          className="w-4 h-4 rounded-full" 
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-sm">{item.name}: {item.value}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Membership Analysis */}
+            <Card>
               <CardHeader>
-                <CardTitle>Revenue Prediction (₹)</CardTitle>
+                <CardTitle>Membership Analysis</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="month" />
-                    <YAxis tickFormatter={(value: number) => `₹${(value / 100000).toFixed(1)}L`} />
+                  <BarChart data={membershipData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="plan" />
+                    <YAxis yAxisId="left" />
+                    <YAxis yAxisId="right" orientation="right" />
                     <Tooltip 
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "6px",
+                      formatter={(value: any, name: string) => {
+                        if (name === 'revenue') {
+                          return [`₹${(value as number).toLocaleString()}`, 'Revenue'];
+                        }
+                        return [value as number, 'Members'];
                       }}
-                      formatter={(value: number) => [`₹${(value / 100000).toFixed(1)}L`, ""]}
                     />
-                    <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Actual Revenue" />
-                    <Bar dataKey="forecast" fill="hsl(var(--primary))" opacity={0.5} name="Forecast" />
+                    <Bar yAxisId="left" dataKey="members" fill="#82ca9d" />
+                    <Bar yAxisId="right" dataKey="revenue" fill="#8884d8" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Space Utilization */}
-            <Card className="animate-slide-up">
-              <CardHeader>
-                <CardTitle>Space Utilization</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={spaceUtilization}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}%`}
+            {/* Reports & Actions */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Available Reports</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "Report", description: "Generating monthly occupancy report..." })}
                     >
-                      {spaceUtilization.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Monthly Occupancy Report
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "Report", description: "Generating revenue analysis report..." })}
+                    >
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Revenue Analysis Report
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "Report", description: "Generating member activity report..." })}
+                    >
+                      <Users className="h-4 w-4 mr-2" />
+                      Member Activity Report
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "Report", description: "Generating space utilization report..." })}
+                    >
+                      <Building className="h-4 w-4 mr-2" />
+                      Space Utilization Report
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Operational Insights */}
-            <Card className="animate-slide-up">
-              <CardHeader>
-                <CardTitle>Operational Insights</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-3 bg-green-50 rounded-lg">
-                    <div className="flex items-center">
-                      <TrendingUp className="h-4 w-4 text-green-600 mr-2" />
-                      <span className="font-medium">Peak Hours</span>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance Insights</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-green-50 rounded-lg">
+                      <h4 className="font-semibold text-green-800">Peak Performance</h4>
+                      <p className="text-sm text-green-600">Meeting rooms achieve 95% utilization during 2-4 PM</p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">2:00 PM - 4:00 PM daily</p>
-                  </div>
-                  
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <div className="flex items-center">
-                      <Users className="h-4 w-4 text-blue-600 mr-2" />
-                      <span className="font-medium">Average Stay</span>
+                    <div className="p-4 bg-blue-50 rounded-lg">
+                      <h4 className="font-semibold text-blue-800">Growth Opportunity</h4>
+                      <p className="text-sm text-blue-600">Hot desk demand increased by 23% this quarter</p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">6.5 hours per visit</p>
-                  </div>
-                  
-                  <div className="p-3 bg-yellow-50 rounded-lg">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 text-yellow-600 mr-2" />
-                      <span className="font-medium">Booking Lead Time</span>
+                    <div className="p-4 bg-yellow-50 rounded-lg">
+                      <h4 className="font-semibold text-yellow-800">Optimization Needed</h4>
+                      <p className="text-sm text-yellow-600">Private offices show 15% lower utilization</p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">2.3 days average</p>
+                    <div className="p-4 bg-purple-50 rounded-lg">
+                      <h4 className="font-semibold text-purple-800">Revenue Impact</h4>
+                      <p className="text-sm text-purple-600">Premium memberships contribute 68% of total revenue</p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* AI Recommendations */}
-            <Card className="animate-slide-up">
-              <CardHeader>
-                <CardTitle>AI Recommendations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-3 border-l-4 border-blue-500 bg-blue-50">
-                    <h4 className="font-medium">Capacity Optimization</h4>
-                    <p className="text-sm text-muted-foreground">Consider adding 3 more hot desks in Zone A</p>
-                  </div>
-                  
-                  <div className="p-3 border-l-4 border-green-500 bg-green-50">
-                    <h4 className="font-medium">Revenue Opportunity</h4>
-                    <p className="text-sm text-muted-foreground">Meeting Room B has 35% unused capacity</p>
-                  </div>
-                  
-                  <div className="p-3 border-l-4 border-yellow-500 bg-yellow-50">
-                    <h4 className="font-medium">Member Retention</h4>
-                    <p className="text-sm text-muted-foreground">12 members at risk of churning next month</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       </div>
