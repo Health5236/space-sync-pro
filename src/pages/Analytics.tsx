@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,17 +37,33 @@ const Analytics = () => {
 
   const handleExportReport = () => {
     toast({
-      title: "Report Export",
+      title: "Export Started",
       description: "Generating comprehensive analytics report...",
     });
     
-    // Simulate report generation
+    // Create and download CSV
+    const csvData = [
+      ["Month", "Occupancy %", "Revenue"],
+      ...occupancyData.map(item => [item.month, item.occupancy, item.revenue])
+    ];
+    
+    const csvContent = csvData.map(row => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `analytics-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
     setTimeout(() => {
       toast({
-        title: "Report Ready",
+        title: "Report Downloaded",
         description: "Analytics report has been generated and downloaded successfully.",
       });
-    }, 2000);
+    }, 1000);
   };
 
   const handleScenarioPlanning = () => {
@@ -57,13 +72,95 @@ const Analytics = () => {
       description: "Opening scenario planning tool...",
     });
     
-    // Simulate opening scenario planning
+    // Simulate scenario analysis
     setTimeout(() => {
+      const scenarios = [
+        "15% growth in next quarter based on current trends",
+        "Optimistic scenario: 25% growth with new marketing campaign",
+        "Conservative scenario: 8% growth with current resources"
+      ];
+      
+      const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+      
       toast({
-        title: "Scenario Analysis",
-        description: "Based on current trends, projected 15% growth in next quarter.",
+        title: "Scenario Analysis Complete",
+        description: `Projection: ${randomScenario}`,
       });
     }, 1500);
+  };
+
+  const handleSpecificReport = (reportType: string) => {
+    toast({
+      title: "Report Generation Started",
+      description: `Generating ${reportType}...`,
+    });
+
+    let reportData: any[] = [];
+    let filename = "";
+
+    switch (reportType) {
+      case "Monthly Occupancy Report":
+        reportData = [
+          ["Month", "Occupancy Rate", "Available Spaces", "Occupied Spaces"],
+          ["January", "75%", "100", "75"],
+          ["February", "82%", "100", "82"],
+          ["March", "78%", "100", "78"],
+          ["April", "88%", "100", "88"],
+          ["May", "85%", "100", "85"],
+          ["June", "92%", "100", "92"]
+        ];
+        filename = "monthly-occupancy-report";
+        break;
+      case "Revenue Analysis Report":
+        reportData = [
+          ["Plan", "Members", "Revenue", "Growth"],
+          ["Basic", "120", "₹240,000", "+5%"],
+          ["Premium", "85", "₹340,000", "+12%"],
+          ["Enterprise", "45", "₹360,000", "+8%"],
+          ["Day Pass", "200", "₹100,000", "+15%"]
+        ];
+        filename = "revenue-analysis-report";
+        break;
+      case "Member Activity Report":
+        reportData = [
+          ["Member", "Check-ins", "Hours", "Plan"],
+          ["John Doe", "25", "180", "Premium"],
+          ["Sarah Johnson", "22", "165", "Basic"],
+          ["Mike Wilson", "15", "120", "Day Pass"],
+          ["Alice Cooper", "30", "220", "Enterprise"]
+        ];
+        filename = "member-activity-report";
+        break;
+      case "Space Utilization Report":
+        reportData = [
+          ["Space Type", "Utilization %", "Peak Hours", "Revenue"],
+          ["Meeting Rooms", "95%", "2-4 PM", "₹150,000"],
+          ["Hot Desks", "78%", "9-11 AM", "₹80,000"],
+          ["Private Offices", "65%", "10-12 PM", "₹200,000"],
+          ["Co-working", "88%", "All Day", "₹120,000"]
+        ];
+        filename = "space-utilization-report";
+        break;
+    }
+
+    // Generate and download CSV
+    setTimeout(() => {
+      const csvContent = reportData.map(row => row.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${filename}-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Report Ready",
+        description: `${reportType} has been generated and downloaded successfully.`,
+      });
+    }, 2000);
   };
 
   return (
@@ -279,7 +376,7 @@ const Analytics = () => {
                     <Button 
                       variant="outline" 
                       className="w-full justify-start"
-                      onClick={() => toast({ title: "Report", description: "Generating monthly occupancy report..." })}
+                      onClick={() => handleSpecificReport("Monthly Occupancy Report")}
                     >
                       <FileText className="h-4 w-4 mr-2" />
                       Monthly Occupancy Report
@@ -287,7 +384,7 @@ const Analytics = () => {
                     <Button 
                       variant="outline" 
                       className="w-full justify-start"
-                      onClick={() => toast({ title: "Report", description: "Generating revenue analysis report..." })}
+                      onClick={() => handleSpecificReport("Revenue Analysis Report")}
                     >
                       <DollarSign className="h-4 w-4 mr-2" />
                       Revenue Analysis Report
@@ -295,7 +392,7 @@ const Analytics = () => {
                     <Button 
                       variant="outline" 
                       className="w-full justify-start"
-                      onClick={() => toast({ title: "Report", description: "Generating member activity report..." })}
+                      onClick={() => handleSpecificReport("Member Activity Report")}
                     >
                       <Users className="h-4 w-4 mr-2" />
                       Member Activity Report
@@ -303,7 +400,7 @@ const Analytics = () => {
                     <Button 
                       variant="outline" 
                       className="w-full justify-start"
-                      onClick={() => toast({ title: "Report", description: "Generating space utilization report..." })}
+                      onClick={() => handleSpecificReport("Space Utilization Report")}
                     >
                       <Building className="h-4 w-4 mr-2" />
                       Space Utilization Report

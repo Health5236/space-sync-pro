@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,8 +17,7 @@ const Billing = () => {
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-
-  const mockInvoices = [
+  const [invoices, setInvoices] = useState([
     {
       id: "INV-001",
       clientName: "TechCorp Solutions",
@@ -45,7 +45,7 @@ const Billing = () => {
       issueDate: "2024-01-10",
       items: ["Day Pass", "Conference Room"],
     },
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -57,7 +57,7 @@ const Billing = () => {
     }
   };
 
-  const filteredInvoices = mockInvoices.filter(invoice => {
+  const filteredInvoices = invoices.filter(invoice => {
     const matchesSearch = invoice.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.id.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -66,10 +66,90 @@ const Billing = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const handleInvoiceAction = (action: string, invoiceId: string) => {
+  const handleViewInvoice = (invoiceId: string) => {
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (invoice) {
+      // Create a detailed invoice view
+      const invoiceDetails = `
+Invoice: ${invoice.id}
+Client: ${invoice.clientName}
+Amount: ${invoice.amount}
+Status: ${invoice.status.toUpperCase()}
+Issue Date: ${invoice.issueDate}
+Due Date: ${invoice.dueDate}
+Items: ${invoice.items.join(', ')}
+      `;
+      
+      // Create a new window with invoice details
+      const newWindow = window.open('', '_blank', 'width=600,height=400');
+      if (newWindow) {
+        newWindow.document.write(`
+          <html>
+            <head><title>Invoice ${invoice.id}</title></head>
+            <body style="font-family: Arial, sans-serif; padding: 20px;">
+              <h2>Invoice ${invoice.id}</h2>
+              <pre>${invoiceDetails}</pre>
+              <button onclick="window.print()">Print</button>
+            </body>
+          </html>
+        `);
+      }
+    }
+    
     toast({
-      title: `${action} Invoice`,
-      description: `${action} action for invoice ${invoiceId} has been processed.`,
+      title: "View Invoice",
+      description: `Opening invoice ${invoiceId} in new window`,
+    });
+  };
+
+  const handleSendInvoice = (invoiceId: string) => {
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (invoice) {
+      // Simulate sending email
+      setTimeout(() => {
+        toast({
+          title: "Invoice Sent",
+          description: `Invoice ${invoiceId} has been sent to ${invoice.clientName}`,
+        });
+      }, 1000);
+    }
+  };
+
+  const handleDownloadPDF = (invoiceId: string) => {
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (invoice) {
+      // Create a simple text content for download
+      const content = `Invoice: ${invoice.id}\nClient: ${invoice.clientName}\nAmount: ${invoice.amount}\nStatus: ${invoice.status}\nIssue Date: ${invoice.issueDate}\nDue Date: ${invoice.dueDate}\nItems: ${invoice.items.join(', ')}`;
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `invoice-${invoiceId}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Download Started",
+        description: `Invoice ${invoiceId} is being downloaded`,
+      });
+    }
+  };
+
+  const handleMarkAsPaid = (invoiceId: string) => {
+    setInvoices(prevInvoices => 
+      prevInvoices.map(invoice => 
+        invoice.id === invoiceId 
+          ? { ...invoice, status: "paid" }
+          : invoice
+      )
+    );
+    
+    toast({
+      title: "Status Updated",
+      description: `Invoice ${invoiceId} has been marked as paid`,
     });
   };
 
@@ -252,19 +332,19 @@ const Billing = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem onClick={() => handleInvoiceAction("View", invoice.id)}>
+                            <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
                               <Eye className="h-4 w-4 mr-2" />
                               View Invoice
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleInvoiceAction("Send", invoice.id)}>
+                            <DropdownMenuItem onClick={() => handleSendInvoice(invoice.id)}>
                               <Send className="h-4 w-4 mr-2" />
                               Send Invoice
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleInvoiceAction("Download", invoice.id)}>
+                            <DropdownMenuItem onClick={() => handleDownloadPDF(invoice.id)}>
                               <Download className="h-4 w-4 mr-2" />
                               Download PDF
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleInvoiceAction("Mark as Paid", invoice.id)}>
+                            <DropdownMenuItem onClick={() => handleMarkAsPaid(invoice.id)}>
                               <CreditCard className="h-4 w-4 mr-2" />
                               Mark as Paid
                             </DropdownMenuItem>

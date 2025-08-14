@@ -29,9 +29,10 @@ type LeadFormData = z.infer<typeof leadSchema>;
 interface LeadFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onLeadAdded?: (leadData: LeadFormData) => void;
 }
 
-const LeadForm = ({ open, onOpenChange }: LeadFormProps) => {
+const LeadForm = ({ open, onOpenChange, onLeadAdded }: LeadFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -57,6 +58,12 @@ const LeadForm = ({ open, onOpenChange }: LeadFormProps) => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       console.log("Lead created:", data);
+      
+      // Call the callback to add lead to the list
+      if (onLeadAdded) {
+        onLeadAdded(data);
+      }
+      
       toast({
         title: "Lead Added",
         description: `Successfully added ${data.firstName} ${data.lastName} as a new lead`,

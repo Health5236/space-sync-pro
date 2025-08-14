@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserPlus, Mail, Phone, Building2, Plus, Search, Filter, TrendingUp, Users, DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import LeadForm from "@/components/forms/LeadForm";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
@@ -13,8 +14,9 @@ import Sidebar from "@/components/layout/Sidebar";
 const Leads = () => {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const mockLeads = [
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterInterest, setFilterInterest] = useState("all");
+  const [leads, setLeads] = useState([
     {
       id: "1",
       name: "Alice Cooper",
@@ -54,7 +56,7 @@ const Leads = () => {
       createdDate: "2024-01-10",
       avatar: "",
     },
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -76,11 +78,34 @@ const Leads = () => {
     }
   };
 
-  const filteredLeads = mockLeads.filter(lead =>
-    lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.company.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredLeads = leads.filter(lead => {
+    const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.company.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = filterStatus === "all" || lead.status === filterStatus;
+    const matchesInterest = filterInterest === "all" || lead.interest === filterInterest;
+    
+    return matchesSearch && matchesStatus && matchesInterest;
+  });
+
+  const handleAddLead = (leadData: any) => {
+    const newLead = {
+      id: (leads.length + 1).toString(),
+      name: `${leadData.firstName} ${leadData.lastName}`,
+      email: leadData.email,
+      phone: leadData.phone,
+      company: leadData.company,
+      source: leadData.source,
+      interest: leadData.interest,
+      budget: leadData.budget,
+      status: "new",
+      createdDate: new Date().toISOString().split('T')[0],
+      avatar: "",
+    };
+    
+    setLeads(prevLeads => [newLead, ...prevLeads]);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -115,6 +140,33 @@ const Leads = () => {
                   className="pl-10"
                 />
               </div>
+              
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="contacted">Contacted</SelectItem>
+                  <SelectItem value="qualified">Qualified</SelectItem>
+                  <SelectItem value="converted">Converted</SelectItem>
+                  <SelectItem value="lost">Lost</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={filterInterest} onValueChange={setFilterInterest}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Interest" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Interest</SelectItem>
+                  <SelectItem value="High">High</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="Low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
                 Filter
@@ -128,7 +180,7 @@ const Leads = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Leads</p>
-                      <p className="text-2xl font-bold">156</p>
+                      <p className="text-2xl font-bold">{leads.length}</p>
                     </div>
                     <Users className="h-8 w-8 text-blue-600" />
                   </div>
@@ -140,7 +192,7 @@ const Leads = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">New This Week</p>
-                      <p className="text-2xl font-bold">23</p>
+                      <p className="text-2xl font-bold">{leads.filter(l => l.status === 'new').length}</p>
                     </div>
                     <UserPlus className="h-8 w-8 text-green-600" />
                   </div>
@@ -152,7 +204,9 @@ const Leads = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Conversion Rate</p>
-                      <p className="text-2xl font-bold">24%</p>
+                      <p className="text-2xl font-bold">
+                        {Math.round((leads.filter(l => l.status === 'converted').length / leads.length) * 100) || 0}%
+                      </p>
                     </div>
                     <TrendingUp className="h-8 w-8 text-purple-600" />
                   </div>
@@ -163,8 +217,8 @@ const Leads = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Potential Revenue</p>
-                      <p className="text-2xl font-bold">₹2,45,000</p>
+                      <p className="text-sm font-medium text-gray-600">High Interest</p>
+                      <p className="text-2xl font-bold">{leads.filter(l => l.interest === 'High').length}</p>
                     </div>
                     <DollarSign className="h-8 w-8 text-yellow-600" />
                   </div>
@@ -175,7 +229,7 @@ const Leads = () => {
             {/* Leads List */}
             <Card>
               <CardHeader>
-                <CardTitle>All Leads</CardTitle>
+                <CardTitle>All Leads ({filteredLeads.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -230,7 +284,8 @@ const Leads = () => {
 
           <LeadForm 
             open={showLeadForm} 
-            onOpenChange={setShowLeadForm} 
+            onOpenChange={setShowLeadForm}
+            onLeadAdded={handleAddLead}
           />
         </main>
       </div>

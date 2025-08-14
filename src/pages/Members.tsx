@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -96,6 +97,45 @@ const Members = () => {
       title: "Export Started",
       description: "Member data is being exported to CSV...",
     });
+
+    // Create CSV data
+    const csvData = [
+      ["Name", "Email", "Phone", "Company", "Plan", "Status", "Join Date", "Credits", "Last Visit"],
+      ...filteredMembers.map(member => [
+        member.name,
+        member.email,
+        member.phone,
+        member.company,
+        member.plan,
+        member.status,
+        member.joinDate,
+        member.credits.toString(),
+        member.lastVisit
+      ])
+    ];
+
+    // Convert to CSV string
+    const csvContent = csvData.map(row => 
+      row.map(field => `"${field}"`).join(",")
+    ).join("\n");
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `members-export-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+      toast({
+        title: "Export Complete",
+        description: "Member data has been exported successfully.",
+      });
+    }, 1500);
   };
 
   const handleMemberAction = (action: string, memberName: string) => {
